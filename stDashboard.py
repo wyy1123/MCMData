@@ -28,6 +28,7 @@ SPData = pd.read_csv('minfrequencySP.csv')
 
 
 #generates the plot
+st.title('SP500 with MCM buy and sell exhaustion siganls')
 fig = go.Figure(data =go.Scatter(x=seller_exhaustion_df['Timestamp'].apply(lambda x: pd.Timestamp(x)), y=seller_exhaustion_df['PriceLevel']*100, mode='markers',name='Seller Exhaustion',marker = {'color':'red'}))
 fig.add_trace(go.Scatter(x=SPData['Time'].apply(lambda x: pd.Timestamp(x)), y=SPData['Price'], mode='lines',name='SP500',fillcolor='blue',line = {'color':'blue'}))
 fig.add_trace(go.Scatter(x=buyer_exhaustion_df['Timestamp'].apply(lambda x: pd.Timestamp(x)), y=buyer_exhaustion_df['PriceLevel']*100, mode='markers',name='Buyer Exhaustion'))
