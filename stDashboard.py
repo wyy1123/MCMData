@@ -16,9 +16,11 @@ with st.sidebar:
     look_at_buy_exhaustions = st.checkbox('plot buyer exhaustion signals separately')
     if look_at_buy_exhaustions:
         buy_6minMA = st.checkbox('6min MA convergence as metric to measure buyer exhaustion signal')
+        buy_percentile = st.number_input("percentile threshold")
     look_at_sell_exhaustions = st.checkbox('plot seller exhaustion signals separately')
     if look_at_sell_exhaustions:
         sell_6minMA = st.checkbox('6min MA convergence as metric to measure seller exhaustion signal')
+        sell_percentile = st.number_input("percentile threshold")
 
 
 df = pd.read_csv('SPTickTool.csv')
@@ -60,6 +62,7 @@ st.plotly_chart(fig)
 
 if look_at_buy_exhaustions:
     if buy_6minMA:
+        buyer_exhaustion_df = buyer_exhaustion_df[buyer_exhaustion_df['Percentile']>=buy_percentile]
         winner_buyer_exhaustion_df = buyer_exhaustion_df[buyer_exhaustion_df['IsWinner']]
         loser_buyer_exhaustion_df = buyer_exhaustion_df[np.logical_not(buyer_exhaustion_df['IsWinner'])]
         st.subheader('SP500 with buyer exhaustion siganls evaluated based on 6min MA convergence')
@@ -76,6 +79,7 @@ if look_at_buy_exhaustions:
 
 if look_at_sell_exhaustions:
     if sell_6minMA:
+        seller_exhaustion_df = seller_exhaustion_df[seller_exhaustion_df['Percentile']>=sell_percentile]
         st.subheader('SP500 with seller exhaustion siganls evaluated based on 6min MA convergence')
         st.write('winning rate of all seller exhaustion signals in this time period is', seller_exhaustion_df[seller_exhaustion_df['IsWinner']].shape[0],'/',seller_exhaustion_df.shape[0])
         st.write('total P/L is',np.sum(seller_exhaustion_df['P/L']))
