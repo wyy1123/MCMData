@@ -64,6 +64,7 @@ if look_at_buy_exhaustions:
         loser_buyer_exhaustion_df = buyer_exhaustion_df[np.logical_not(buyer_exhaustion_df['IsWinner'])]
         st.subheader('SP500 with buyer exhaustion siganls evaluated based on 6min MA convergence')
         st.write('winning rate of all buyer exhaustion signals in this time period is', buyer_exhaustion_df[buyer_exhaustion_df['IsWinner']].shape[0],'/',buyer_exhaustion_df.shape[0])
+        st.write('total P/L is',np.sum(buyer_exhaustion_df['P/L']))
         fig1 = go.Figure()
         fig1.add_trace(go.Scatter(x=SPData['Time'].apply(lambda x: pd.Timestamp(x)), y=SPData['Price']/100, mode='lines',name='SP500',fillcolor='blue',line = {'color':'blue'}))
         fig1.add_trace(go.Scatter(x=SPData['Time'].apply(lambda x: pd.Timestamp(x)), y=SPData['6minMA']/100, mode='lines',name='6minMA',fillcolor='orange',line = {'color':'orange'}))
@@ -77,6 +78,7 @@ if look_at_sell_exhaustions:
     if sell_6minMA:
         st.subheader('SP500 with seller exhaustion siganls evaluated based on 6min MA convergence')
         st.write('winning rate of all seller exhaustion signals in this time period is', seller_exhaustion_df[seller_exhaustion_df['IsWinner']].shape[0],'/',seller_exhaustion_df.shape[0])
+        st.write('total P/L is',np.sum(seller_exhaustion_df['P/L']))
         winner_seller_exhaustion_df = seller_exhaustion_df[seller_exhaustion_df['IsWinner']]
         loser_seller_exhaustion_df = seller_exhaustion_df[np.logical_not(seller_exhaustion_df['IsWinner'])]
         fig2 = go.Figure()
