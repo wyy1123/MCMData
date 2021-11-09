@@ -21,6 +21,9 @@ with st.sidebar:
     if look_at_sell_exhaustions:
         sell_6minMA = st.checkbox('6min MA convergence as metric to measure seller exhaustion signal')
         sell_percentile = st.number_input("percentile threshold")
+    
+    #TODO: add filtering for market open
+
 
 
 df = pd.read_csv('SPTickTool.csv')
@@ -75,6 +78,8 @@ if look_at_buy_exhaustions:
         fig1.add_trace(go.Scatter(x=loser_buyer_exhaustion_df['Timestamp'].apply(lambda x: pd.Timestamp(x)), y=loser_buyer_exhaustion_df['PriceLevel'], mode='markers',name='Unsuccessful Buyer Exhaustion Signals',marker = {'color':'red'}))
         fig1.update_layout(width=1000,height=500)
         st.plotly_chart(fig1)
+        st.write("table view of buyer exhaustion signals")
+        st.write(buyer_exhaustion_df)
 
 
 if look_at_sell_exhaustions:
@@ -92,6 +97,13 @@ if look_at_sell_exhaustions:
         fig2.add_trace(go.Scatter(x=loser_seller_exhaustion_df['Timestamp'].apply(lambda x: pd.Timestamp(x)), y=loser_seller_exhaustion_df['PriceLevel'], mode='markers',name='Unsuccessful Seller Exhaustion Signals',marker = {'color':'red'}))
         fig2.update_layout(width=1000,height=500)
         st.plotly_chart(fig2)
+        st.write("table view of seller exhaustion signals")
+        st.write(seller_exhaustion_df)
+
+
+
+
+
 
 # #helper functions:
 # def add_price_levels(df):
