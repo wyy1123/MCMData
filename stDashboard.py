@@ -25,11 +25,11 @@ with st.sidebar:
     look_at_buy_exhaustions = st.checkbox('plot buyer exhaustion signals separately')
     if look_at_buy_exhaustions:
         buy_6minMA = st.checkbox('6min MA convergence as metric to measure buyer exhaustion signal')
-        buy_percentile = st.number_input("percentile threshold")
+        buy_percentile = st.number_input("buyer exhaustion percentile threshold")
     look_at_sell_exhaustions = st.checkbox('plot seller exhaustion signals separately')
     if look_at_sell_exhaustions:
         sell_6minMA = st.checkbox('6min MA convergence as metric to measure seller exhaustion signal')
-        sell_percentile = st.number_input("percentile threshold")
+        sell_percentile = st.number_input("seller exhaustion percentile threshold")
     #TODO: add filtering for market open
     filter_out_by_time= st.checkbox('Filter out signals from a certain period in a day(EST)')
     if filter_out_by_time:
@@ -38,7 +38,7 @@ with st.sidebar:
         filter_end_time = st.text_input("end time","10:00")
         filter_start_time = to_timedelta(filter_start_time+':00')
         filter_end_time = to_timedelta(filter_end_time+':00')
-        
+
         if filter_end_time < filter_start_time:
             st.write('Please enter a start time that\'s earlier than the end time')
 
