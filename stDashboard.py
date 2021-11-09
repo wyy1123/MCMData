@@ -4,14 +4,23 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 import plotly.graph_objs as go
+import datetime
 
+
+def to_timedelta(date): 
+    date = pd.to_datetime(date)
+    try:
+        date_start = datetime.datetime(date.year, date.month, date.day, 0, 0)
+    except TypeError:
+        return pd.NaT # to keep dtype of series; Alternative: pd.Timedelta(0)
+    return date - date_start
 
 
 #sidebar where we get user input variables
 with st.sidebar:
-    start_date = st.date_input('select a start date for data')
+    start_date = st.date_input('select a start date for data',datetime.date(2021,7,1))
     start_date = pd.to_datetime(start_date)
-    end_date = st.date_input('select an end date for data')
+    end_date = st.date_input('select an end date for data',datetime.date(2021,10,1))
     end_date = pd.to_datetime(end_date)
     look_at_buy_exhaustions = st.checkbox('plot buyer exhaustion signals separately')
     if look_at_buy_exhaustions:
@@ -21,8 +30,19 @@ with st.sidebar:
     if look_at_sell_exhaustions:
         sell_6minMA = st.checkbox('6min MA convergence as metric to measure seller exhaustion signal')
         sell_percentile = st.number_input("percentile threshold")
-    
     #TODO: add filtering for market open
+    filter_out_by_time= st.checkbox('Filter out signals from a certain period in a day(EST)')
+    if filter_out_by_time:
+        st.write('Please enter in the format of Hour:Minute, e.g. 19:40, 8:30')
+        filter_start_time = st.text_input("start time","9:30")
+        filter_end_time = st.text_input("end time","10:00")
+        filter_start_time = to_timedelta(filter_start_time+':00')
+        filter_end_time = to_timedelta(filter_end_time+':00')
+        
+        if filter_end_time < filter_start_time:
+            st.write('Please enter a start time that\'s earlier than the end time')
+
+        
 
 
 
@@ -38,6 +58,13 @@ buyer_exhaustion_df = pd.read_csv('buyer_exhaustion_evaluated.csv')
 # buyer_exhaustion_df= buyer_exhaustion_df.reset_index()
 buyer_exhaustion_df['Timestamp'] = buyer_exhaustion_df['Timestamp'].apply(lambda x: pd.Timestamp(x))
 seller_exhaustion_df['Timestamp'] = seller_exhaustion_df['Timestamp'].apply(lambda x: pd.Timestamp(x))
+if filter_out_by_time:
+    # st.write(buyer_exhaustion_df['Timestamp'].apply(lambda x: to_timedelta(x)))
+    buyer_exhaustion_df = buyer_exhaustion_df[np.logical_or(buyer_exhaustion_df['Timestamp'].apply(lambda x: to_timedelta(x)<filter_start_time), buyer_exhaustion_df['Timestamp'].apply(lambda x: to_timedelta(x)>filter_end_time))]
+    seller_exhaustion_df= seller_exhaustion_df[np.logical_or(seller_exhaustion_df['Timestamp'].apply(lambda x: to_timedelta(x)<filter_start_time), seller_exhaustion_df['Timestamp'].apply(lambda x: to_timedelta(x)>filter_end_time))]
+#     buyer_exhaustion_df = buyer_exhaustion_df.between_time(filter_end_time, filter_start_time)
+#     seller_exhaustion_df = seller_exhaustion_df.between_time(filter_end_time, filter_start_time)
+
 buyer_exhaustion_df = buyer_exhaustion_df[np.logical_and(buyer_exhaustion_df['Timestamp']>=start_date,buyer_exhaustion_df['Timestamp']<=end_date)]
 seller_exhaustion_df = seller_exhaustion_df[np.logical_and(seller_exhaustion_df['Timestamp']>=start_date,seller_exhaustion_df['Timestamp']<=end_date)]
 #TODO: filter them through date
@@ -99,8 +126,6 @@ if look_at_sell_exhaustions:
         st.plotly_chart(fig2)
         st.write("table view of seller exhaustion signals")
         st.write(seller_exhaustion_df)
-
-
 
 
 
